@@ -74,4 +74,43 @@ route.get('/:id', async (req, res) => {
     }
 })
 
+route.get('/:id/comments', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const post = await db.findById(id);
+        if (post) {
+            const comments = await db.findPostComments(id);
+            res.status(200).json(comments);
+        } else {
+            res.status(404).json({
+                message: "The post with the specified ID does not exist."
+            });
+        }
+    } catch {
+        res.status(500).json({
+            error: "The comments information could not be retrieved."
+        });
+    }
+});
+
+route.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const post = await db.remove(id);
+        if (post > 0) {
+            res.status(200).json({
+                message: "The post has been removed."
+            });
+        } else {
+            res.status(404).json({
+                message: "The post with the specified ID does not exist."
+            });
+        }
+    } catch {
+        res.status(500).json({
+            error: "The post could not be removed"
+        });
+    }
+});
+
 module.exports = route;
